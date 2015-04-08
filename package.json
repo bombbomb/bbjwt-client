@@ -1,0 +1,14 @@
+{
+  "name": "bbjwt-client",
+  "version": "0.1.0",
+  "description": "This thing checks yo tokens",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "cheech n' ehippy",
+  "license": "ISC",
+  "dependencies": {
+    "jsonwebtoken": "^4.2.2"
+  }
+}
