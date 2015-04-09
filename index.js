@@ -9,12 +9,18 @@ module.exports = {
         return decoded.clientId;
     },
 
-    decodeToken: function(jwt) {
+    decodeToken: function(token) {
         try {
-            var decoded = jwt.verify(jwt, process.env.JWT_SECRET);
+            var decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+            if (!decoded.hasOwnProperty('expires') || decoded.expires < Date.now()/1000) {
+                console.log("JWT token expired failed: " + token);
+                return false;
+            }
+
             return decoded;
         } catch(err) {
-            console.log("JWT decode failed: " + jwt);
+            console.log("JWT decode failed: " + token);
             return false;
         }
     }
