@@ -1,6 +1,6 @@
 {
   "name": "bbjwt-client",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "This thing checks yo tokens",
   "main": "index.js",
   "scripts": {
