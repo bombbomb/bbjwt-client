@@ -17,3 +17,5 @@ if (clientId==false) { //clientId will be false if the token doesn't check out
 }
 console.log("The trusted clientId is: " + clientId);
 ```
+
+Get a token by making an authenticated call to 'https://dev.app.bombbomb.com/app/api/api.php?method=GetJsonWebToken'
