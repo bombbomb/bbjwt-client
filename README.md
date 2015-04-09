@@ -4,6 +4,8 @@ This module is used to authenticate JSON Web Tokens created by the BombBomb API 
 
 Install this module into your project with `npm install bbjwt-client --save`.
 
+*You must to provide the shared secret for signature validation by setting the environment variable* `JWT_SECRET`.
+
 You then include it in your project like so: 
 ```js
 var token = req.headers.jwt; // or however you intake your token
