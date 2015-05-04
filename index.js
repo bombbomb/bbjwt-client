@@ -6,7 +6,7 @@ module.exports = {
         if (payload === false) {
             return false;
         }
-        return decoded.clientId;
+        return payload.clientId;
     },
 
     decodeToken: function(token) {
