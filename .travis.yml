@@ -1,0 +1,8 @@
+language: node_js
+node_js:
+- '4.1.12'
+notifications:
+  slack: bombbomb:1NGTVbjUegZr88uffaUwizC9
+install: npm install
+script:
+  - npm test
