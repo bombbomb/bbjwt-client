@@ -4,11 +4,15 @@
   "description": "This thing checks yo tokens",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha spec/base.spec.js"
   },
   "author": "cheech n' ehippy",
   "license": "ISC",
   "dependencies": {
     "jsonwebtoken": "^4.2.2"
+  },
+  "devDependencies": {
+    "mocha": "^3.2.0",
+    "sinon": "^1.17.7"
   }
 }
