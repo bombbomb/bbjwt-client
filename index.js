@@ -79,7 +79,6 @@ module.exports = {
                     accessKeyId : process.env.AWS_ACCESS_KEY,
                     secretAccessKey: process.env.AWS_SECRET_KEY
                 },
-                signingKey: process.env.SIGNING_KEY,
                 keyArn: process.env.KMS_ARN
             });
 
@@ -96,7 +95,7 @@ module.exports = {
         }
         catch(e)
         {
-            callback()
+            callback(e, null)
         }
 
     }
