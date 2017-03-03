@@ -20,13 +20,17 @@ module.exports = {
                 }
             });
         }
-        else if(jwt.hasOwnProperty('sub'))
+        else if(jwt && jwt.hasOwnProperty('sub'))
         {
             callback(null, jwt.sub)
         }
-        else if(jwt.hasOwnProperty('clientId'))
+        else if(jwt && jwt.hasOwnProperty('clientId'))
         {
             callback(null, jwt.clientId)
+        }
+        else
+        {
+            callback('JWT : Error retrieving clientId, token undefined/missing data?', null);
         }
 
     },

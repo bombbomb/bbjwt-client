@@ -146,8 +146,26 @@ describe('random test', function() {
             assert(clientId == testUser1.clientId, 'clientId should be the same as testUser1');
             done();
         })
-    })
+    });
 
+    it('should return error from an undefined token', function(done) {
+        var undefinedToken;
+        decoder.getClientIdFromToken(undefinedToken, function(err, clientId) {
+            assert(clientId == null, 'no client id should be coming back from null JWT');
+            assert(err == 'JWT : Error retrieving clientId, token undefined/missing data?');
+            done();
+        });
+    });
+
+    it('should return error from a junk token', function(done) {
+        var junkToken = 'thisisjunkman';
+        decoder.getClientIdFromToken(junkToken, function(err, clientId) {
+            assert(clientId == null, 'no client id should be coming back from null JWT');
+            assert(err.message == 'jwt malformed');
+            assert(err.name == 'JsonWebTokenError');
+            done();
+        });
+    })
 
 
 });
