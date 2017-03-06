@@ -83,7 +83,7 @@ module.exports = {
                     accessKeyId : process.env.AWS_ACCESS_KEY,
                     secretAccessKey: process.env.AWS_SECRET_KEY
                 },
-                keyArn: process.env.KMS_ARN
+                signingKey: process.env.SIGNING_KEY
             });
 
             kmsJwt.verify(token, function(err, decoded) {
