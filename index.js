@@ -20,9 +20,9 @@ module.exports = {
                 }
             });
         }
-        else if(jwt && jwt.hasOwnProperty('sub'))
+        else if(jwt && jwt.hasOwnProperty('bbcid'))
         {
-            callback(null, jwt.sub)
+            callback(null, jwt.bbcid)
         }
         else if(jwt && jwt.hasOwnProperty('clientId'))
         {

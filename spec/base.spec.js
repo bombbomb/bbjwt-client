@@ -52,14 +52,15 @@ function createV2JwtPayload()
 {
     return {
         "aud": "DevSiteApiClient",
-        "jti": "35659376a80bec4675f99be67e7685c7c5c4f4a4b157fba51a39906a6d889419db7d049a11647993",
+        "jti": "blahblahblahblahblahblahblahblah",
         "nbf": (Date.now()/1000) + 60,
         "exp": (Date.now()/1000) + 60,
-        "sub": "7a516873-b5fe-42c8-bfbc-b09544381641",
+        "sub": "Random-User-Id",
         "scopes": [
             "email:manage",
             "email:read"
-        ]
+        ],
+        "bbcid": "Random-Client-Id"
     }
 }
 
@@ -116,6 +117,7 @@ describe('random test', function() {
             assert(data.aud == jwtPayload2.aud, 'object properties must match');
             assert(data.sub == jwtPayload2.sub, 'object properties must match');
             assert(data.jti == jwtPayload2.jti, 'object properties must match');
+            assert(data.bbcid == jwtPayload2.bbcid, 'object properties must match');
             done();
         });
     });
@@ -123,7 +125,7 @@ describe('random test', function() {
     it('should return clientId from kms decode', function(done) {
         decoder.getClientIdFromToken(tokenV2, function(err, clientId) {
             assert(err == null, 'no errors should be returned');
-            assert(clientId == testUser2.sub);
+            assert(clientId == testUser2.bbcid);
             done();
         })
     });
