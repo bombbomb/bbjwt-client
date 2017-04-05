@@ -39,6 +39,13 @@ module.exports = {
     {
         var decoded = false;
         var self = this;
+        if (token)  // strip Bearer from prefix
+        {
+            if (token.indexOf(' ') > -1)
+            {
+                token = token.split(' ')[1];
+            }
+        }
         this.decodeWithKms(token, function(err, decodedToken) {
             if(!err && decodedToken)
             {
