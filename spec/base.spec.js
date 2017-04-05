@@ -130,6 +130,14 @@ describe('random test', function() {
         })
     });
 
+    it('using Bearer should return clientId from kms decode', function(done) {
+        decoder.getClientIdFromToken('Bearer '+tokenV2, function(err, clientId) {
+            assert(err == null, 'no errors should be returned');
+            assert(clientId == testUser2.bbcid);
+            done();
+        })
+    });
+
     it('should decode an encrypted token with v1 secret', function(done) {
         KmsJwt.prototype.verify = KmsJwt.verify;
         decoder.decodeToken(tokenV1, function(err, decoded) {
