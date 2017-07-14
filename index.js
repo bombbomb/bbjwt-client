@@ -61,10 +61,11 @@ module.exports = {
                         callback(null, decoded);
                     }
                 }
-                catch(err)
+                catch(exception)
                 {
-                    console.log("JWT V1 decode failed: " + token);
-                    callback(err, decoded);
+                    err && console.error("decodeWithKms Failed: " + err);
+                    console.log("JWT Decode failed: " + token);
+                    callback(exception, decoded);
                 }
             }
         });
@@ -94,8 +95,9 @@ module.exports = {
             });
 
             kmsJwt.verify(token, function(err, decoded) {
-                if(err)
+                if (err)
                 {
+                    console.error('KMS Verify Failed: '+err);
                     callback(err, null);
                 }
                 else
