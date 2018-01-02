@@ -62,8 +62,7 @@ module.exports = {
                     }
                     else
                     {
-                        console.log("JWT V1 decode failed: " + token);
-                        callback("JWT V1 decode failed", null)
+                        throw new Error('V1 decode failed');
                     }
                 }
                 catch(exception)
