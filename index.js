@@ -62,7 +62,7 @@ module.exports = {
                     }
                     else
                     {
-                        throw new Error('V1 decode failed');
+                        throw new Error('decodeV1Token failed');
                     }
                 }
                 catch(exception)
