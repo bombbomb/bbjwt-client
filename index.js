@@ -39,6 +39,13 @@ module.exports = {
     {
         var decoded = false;
         var self = this;
+        if (token)  // strip Bearer from prefix
+        {
+            if (token.indexOf(' ') > -1)
+            {
+                token = token.split(' ')[1];
+            }
+        }
         this.decodeWithKms(token, function(err, decodedToken) {
             if(!err && decodedToken)
             {
@@ -59,10 +66,11 @@ module.exports = {
                         callback("JWT V1 decode failed", null)
                     }
                 }
-                catch(err)
+                catch(exception)
                 {
-                    console.log("JWT V1 decode failed: " + token);
-                    callback(err, decoded);
+                    err && console.error("decodeWithKms Failed: " + err);
+                    console.log("JWT Decode failed: " + token);
+                    callback(exception, decoded);
                 }
             }
         });
@@ -92,8 +100,9 @@ module.exports = {
             });
 
             kmsJwt.verify(token, function(err, decoded) {
-                if(err)
+                if (err)
                 {
+                    console.error('KMS Verify Failed: '+err);
                     callback(err, null);
                 }
                 else
