@@ -53,6 +53,11 @@ module.exports = {
                     {
                         callback(null, decoded);
                     }
+                    else
+                    {
+                        console.log("JWT V1 decode failed: " + token);
+                        callback("JWT V1 decode failed", null)
+                    }
                 }
                 catch(err)
                 {
