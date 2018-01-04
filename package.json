@@ -9,8 +9,8 @@
   "author": "cheech n' ehippy",
   "license": "ISC",
   "dependencies": {
-    "jsonwebtoken": "^4.2.2",
-    "kms-jwt": "^1.0.0"
+    "jsonwebtoken": "^8.1.0",
+    "kms-jwt": "^1.0.2"
   },
   "devDependencies": {
     "mocha": "^3.2.0",

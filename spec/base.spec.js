@@ -175,8 +175,7 @@ describe('random test', function() {
             assert(err.name == 'JsonWebTokenError');
             done();
         });
-    })
-
+    });
 
 });
 
