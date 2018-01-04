@@ -60,6 +60,10 @@ module.exports = {
                     {
                         callback(null, decoded);
                     }
+                    else
+                    {
+                        throw new Error('decodeV1Token failed');
+                    }
                 }
                 catch(exception)
                 {
