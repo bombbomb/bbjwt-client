@@ -2,7 +2,8 @@ language: node_js
 node_js:
 - '4.1.2'
 notifications:
-  slack: bombbomb:1NGTVbjUegZr88uffaUwizC9
+  slack:
+    secure: "XsxC+ZGHGSfi6//C4MnENWwGbUK0D4FCqs9w57NLcgISFuqajWSIol+ufjgjOOXRPdZZr7sqNdXdd44jy2R+8++ObTEFB8VBfTi39pDdjpHMHAWyBTQ3i13kUZh8l8JO757RwfAoZxeQm30ouR9j/GewMrCZfMhUtZIuRDp4lJU="
 install: npm install
 script:
   - npm test
