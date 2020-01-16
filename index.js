@@ -1,12 +1,12 @@
-const jwt     = require('jsonwebtoken');
-const KmsJwt  = require('kms-jwt');
+var jwt     = require('jsonwebtoken');
+var KmsJwt  = require('kms-jwt');
 
-let kmsJwt = null;
+var kmsJwt = null;
 
 module.exports = {
     getClientIdFromToken: function(jwt, callback)
     {
-        const self = this;
+        var self = this;
         if (typeof jwt === 'string') {
             this.decodeToken(jwt, function(err, data) {
                 if(err)
@@ -36,8 +36,8 @@ module.exports = {
 
     decodeToken: function(token, callback)
     {
-        let decoded = false;
-        const self = this;
+        var decoded = false;
+        var self = this;
         if (token)  // strip Bearer from prefix
         {
             if (token.indexOf(' ') > -1)
@@ -76,7 +76,7 @@ module.exports = {
 
     decodeV1Token: function(token)
     {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        var decoded = jwt.verify(token, process.env.JWT_SECRET);
         if (!decoded.hasOwnProperty('expires') || decoded.expires < Date.now()/1000) {
             console.log("JWT token expired failed: " + token);
             return false;
