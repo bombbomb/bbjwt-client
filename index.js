@@ -1,14 +1,13 @@
-var jwt     = require('jsonwebtoken'),
-    KmsJwt  = require('kms-jwt');
+const jwt     = require('jsonwebtoken');
+const KmsJwt  = require('kms-jwt');
 
-
+let kmsJwt = null;
 
 module.exports = {
     getClientIdFromToken: function(jwt, callback)
     {
-        var self = this;
-        if (typeof jwt == 'string')
-        {
+        const self = this;
+        if (typeof jwt === 'string') {
             this.decodeToken(jwt, function(err, data) {
                 if(err)
                 {
@@ -37,8 +36,8 @@ module.exports = {
 
     decodeToken: function(token, callback)
     {
-        var decoded = false;
-        var self = this;
+        let decoded = false;
+        const self = this;
         if (token)  // strip Bearer from prefix
         {
             if (token.indexOf(' ') > -1)
@@ -77,7 +76,7 @@ module.exports = {
 
     decodeV1Token: function(token)
     {
-        var decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         if (!decoded.hasOwnProperty('expires') || decoded.expires < Date.now()/1000) {
             console.log("JWT token expired failed: " + token);
             return false;
@@ -89,15 +88,11 @@ module.exports = {
     {
         try
         {
-            var kmsJwt = new KmsJwt({
-                awsConfig: {
-                    region: process.env.AWS_REGION,
-                    accessKeyId : process.env.AWS_ACCESS_KEY,
-                    secretAccessKey: process.env.AWS_SECRET_KEY
-                },
-                signingKey: process.env.SIGNING_KEY
-            });
-
+            if (!kmsJwt) {
+                kmsJwt = new KmsJwt({
+                    signingKey: process.env.SIGNING_KEY
+                });
+            }
             kmsJwt.verify(token, function(err, decoded) {
                 if (err)
                 {
