@@ -2,7 +2,7 @@ var jwt     = require('jsonwebtoken');
 var KmsJwt  = require('kms-jwt');
 
 var winston = require('winston')
-var logger = winston.createLogger({
+var bbjwtLogger = winston.createLogger({
     transports: new winston.transports.Console({
         format: new winston.format.simple()
     }),
@@ -61,7 +61,7 @@ module.exports = {
             if(!err && decodedToken) {
                 callback(null, decodedToken);
             } else {
-                logger.debug('kms token decoding failed, attempt v1 token decode', { kmsError: err.toString() });
+                bbjwtLogger.debug('kms token decoding failed, attempt v1 token decode', { kmsError: err.toString() });
                 try {
                     decoded = self.decodeV1Token(token);
                     if (decoded) {
@@ -71,9 +71,9 @@ module.exports = {
                     }
                 } catch(exception) {
                     if (err) {
-                        logger.warn('both kms and v1 token decoding failed', { kmsError: err.toString(), v1Error: exception.toString() })
+                        bbjwtLogger.warn('both kms and v1 token decoding failed', { kmsError: err.toString(), v1Error: exception.toString() })
                     } else {
-                        logger.warn('v1 token decoding failed', { v1Error: exception.toString() });
+                        bbjwtLogger.warn('v1 token decoding failed', { v1Error: exception.toString() });
                     }
                     callback(exception, decoded);
                 }
@@ -88,7 +88,7 @@ module.exports = {
     decodeV1Token: function(token) {
         var decoded = jwt.verify(token, process.env.JWT_SECRET);
         if (!decoded.hasOwnProperty('expires') || decoded.expires < Date.now()/1000) {
-            logger.info('jwt token expired failed', { jwt: token });
+            bbjwtLogger.info('jwt token expired failed', { jwt: token });
             return false;
         }
         return decoded;
@@ -104,14 +104,14 @@ module.exports = {
             var kj = getKmsJwt();
             kj.verify(token, (err, decoded) => {
                 if (err) {
-                    logger.debug('kms verify failed', { kmsError: err.toString() });
+                    bbjwtLogger.debug('kms verify failed', { kmsError: err.toString() });
                     callback(err, null);
                 } else {
                     callback(null, decoded);
                 }
             });
         } catch(err) {
-            logger.warn('error occurred while trying to decode with kms', { kmsError: err.toString() });
+            bbjwtLogger.warn('error occurred while trying to decode with kms', { kmsError: err.toString() });
             callback(err, null)
         }
     },
@@ -121,6 +121,6 @@ module.exports = {
      * @param {*} lgr 
      */
     setLogger: function(lgr) {
-        logger = lgr;
+        bbjwtLogger = lgr;
     }
 };
