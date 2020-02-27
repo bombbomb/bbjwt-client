@@ -9,16 +9,6 @@ var assert      = require('assert'),
 
 var mockData = createV2JwtPayload();
 
-KmsJwt.prototype.verify = function(token, callback)
-{
-    callback(null, mockData)
-};
-
-var decoder = proxyquire('../index', {
-    'kms-jwt' : KmsJwt
-});
-
-
 function createRandomString(noOfChars)
 {
     var secret = '';
@@ -67,6 +57,17 @@ function createV2JwtPayload()
 describe('random test', function() {
 
     var testUser1, testUser2, jwtPayload1, jwtPayload2, tokenV1, tokenV2, randomToken;
+    var sandbox = null;
+    var decoder = null;
+    this.beforeEach(function() {
+        sandbox = sinon.sandbox.create();
+        decoder = require('rewire')('..');
+        decoder.__set__('kmsJwt', null);
+    });
+    this.afterEach(function() {
+        decoder.__set__('kmsJwt', null);
+        sandbox.restore();
+    });
 
     before(function() {
         process.env.JWT_SECRET = createRandomString(10);
@@ -112,6 +113,7 @@ describe('random test', function() {
     });
 
     it('should decode token using kms', function(done) {
+        sandbox.stub(KmsJwt.prototype, 'verify').callsArgWith(1, null, mockData);
         decoder.decodeWithKms(tokenV2, function(err, data) {
             assert(err == null, 'no errors should be returned');
             assert(data.aud == jwtPayload2.aud, 'object properties must match');
@@ -123,6 +125,7 @@ describe('random test', function() {
     });
 
     it('should return clientId from kms decode', function(done) {
+        sandbox.stub(KmsJwt.prototype, 'verify').callsArgWith(1, null, mockData);
         decoder.getClientIdFromToken(tokenV2, function(err, clientId) {
             assert(err == null, 'no errors should be returned');
             assert(clientId == testUser2.bbcid);
@@ -131,6 +134,7 @@ describe('random test', function() {
     });
 
     it('using Bearer should return clientId from kms decode', function(done) {
+        sandbox.stub(KmsJwt.prototype, 'verify').callsArgWith(1, null, mockData);
         decoder.getClientIdFromToken('Bearer '+tokenV2, function(err, clientId) {
             assert(err == null, 'no errors should be returned');
             assert(clientId == testUser2.bbcid);
@@ -139,7 +143,7 @@ describe('random test', function() {
     });
 
     it('should decode an encrypted token with v1 secret', function(done) {
-        KmsJwt.prototype.verify = KmsJwt.verify;
+        sandbox.stub(KmsJwt.prototype, 'verify').callsArgWith(1, 'err');
         decoder.decodeToken(tokenV1, function(err, decoded) {
             assert(err == null, 'there should be no errors returned');
             assert(decoded.expires == jwtPayload1.expires, 'expiry time should be equal');
@@ -169,6 +173,7 @@ describe('random test', function() {
 
     it('should return error from a junk token', function(done) {
         var junkToken = 'thisisjunkman';
+        sandbox.stub(KmsJwt.prototype, 'verify').callsArgWith(1, 'err');
         decoder.getClientIdFromToken(junkToken, function(err, clientId) {
             assert(clientId == null, 'no client id should be coming back from null JWT');
             assert(err.message == 'jwt malformed');
