@@ -1,6 +1,6 @@
 {
   "name": "bbjwt-client",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "description": "This thing checks yo tokens",
   "main": "index.js",
   "scripts": {
@@ -10,11 +10,13 @@
   "license": "ISC",
   "dependencies": {
     "jsonwebtoken": "^8.1.0",
-    "kms-jwt": "^1.0.2"
+    "kms-jwt": "^1.0.2",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "mocha": "^3.2.0",
     "proxyquire": "^1.7.11",
+    "rewire": "^4.0.1",
     "sinon": "^1.17.7"
   }
 }

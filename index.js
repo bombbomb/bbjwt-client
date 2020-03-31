@@ -1,118 +1,126 @@
 var jwt     = require('jsonwebtoken');
 var KmsJwt  = require('kms-jwt');
 
+var winston = require('winston')
+var bbjwtLogger = winston.createLogger({
+    transports: new winston.transports.Console({
+        format: new winston.format.simple()
+    }),
+    level: 'info'
+});
+
 var kmsJwt = null;
+var getKmsJwt = () => {
+    if (!kmsJwt) {
+        kmsJwt = new KmsJwt({
+            signingKey: process.env.SIGNING_KEY
+        });
+    }
+    return kmsJwt;
+};
 
 module.exports = {
-    getClientIdFromToken: function(jwt, callback)
-    {
+    /**
+     * Gets a client id from a token, checks both KMS type and v1 type tokens
+     * Calls callback with (null, clientId) if possible
+     * @param {*} jwt { string | object} jwt to decode
+     * @param {*} callback {(err: any, clientId: string) => any}
+     */
+    getClientIdFromToken: function(jwt, callback) {
         var self = this;
         if (typeof jwt === 'string') {
-            this.decodeToken(jwt, function(err, data) {
-                if(err)
-                {
+            self.decodeToken(jwt, (err, data)  => {
+                if(err) {
                     callback(err, null);
-                }
-                else
-                {
+                } else {
                     self.getClientIdFromToken(data, callback)
                 }
             });
-        }
-        else if(jwt && jwt.hasOwnProperty('bbcid'))
-        {
+        } else if(jwt && jwt.hasOwnProperty('bbcid')) {
             callback(null, jwt.bbcid)
-        }
-        else if(jwt && jwt.hasOwnProperty('clientId'))
-        {
+        } else if(jwt && jwt.hasOwnProperty('clientId')) {
             callback(null, jwt.clientId)
-        }
-        else
-        {
+        } else {
             callback('JWT : Error retrieving clientId, token undefined/missing data?', null);
         }
-
     },
-
-    decodeToken: function(token, callback)
-    {
+    /**
+     * Decodes a token, first trying kms, then v1 token.
+     * Callback is called with decoded token.
+     * @param {*} token {string} token to decode
+     * @param {*} callback {(err: any, decodedToken: {}) => any}
+     */
+    decodeToken: function(token, callback) {
         var decoded = false;
-        var self = this;
-        if (token)  // strip Bearer from prefix
-        {
-            if (token.indexOf(' ') > -1)
-            {
-                token = token.split(' ')[1];
-            }
+        // strip Bearer from prefix
+        if (token && token.indexOf(' ') > -1) {
+            token = token.split(' ')[1];
         }
-        this.decodeWithKms(token, function(err, decodedToken) {
-            if(!err && decodedToken)
-            {
+        var self = this;
+        self.decodeWithKms(token, (err, decodedToken) => {
+            if(!err && decodedToken) {
                 callback(null, decodedToken);
-            }
-            else
-            {
-                try
-                {
+            } else {
+                bbjwtLogger.debug('kms token decoding failed, attempt v1 token decode', { kmsError: err.toString() });
+                try {
                     decoded = self.decodeV1Token(token);
-                    if (decoded)
-                    {
+                    if (decoded) {
                         callback(null, decoded);
-                    }
-                    else
-                    {
+                    } else {
                         throw new Error('decodeV1Token failed');
                     }
-                }
-                catch(exception)
-                {
-                    err && console.error("decodeWithKms Failed: " + err);
-                    console.log("JWT Decode failed: " + token);
+                } catch(exception) {
+                    if (err) {
+                        bbjwtLogger.warn('both kms and v1 token decoding failed', { kmsError: err.toString(), v1Error: exception.toString() })
+                    } else {
+                        bbjwtLogger.warn('v1 token decoding failed', { v1Error: exception.toString() });
+                    }
                     callback(exception, decoded);
                 }
             }
         });
     },
-
-    decodeV1Token: function(token)
-    {
+    /**
+     * Attempts to decode V1 token.
+     * @param {*} token {string}
+     * @returns {false|object} Returns decoded token from jsonwebtoken.verify or false if token expired
+     */
+    decodeV1Token: function(token) {
         var decoded = jwt.verify(token, process.env.JWT_SECRET);
         if (!decoded.hasOwnProperty('expires') || decoded.expires < Date.now()/1000) {
-            console.log("JWT token expired failed: " + token);
+            bbjwtLogger.info('jwt token expired failed', { jwt: token });
             return false;
         }
         return decoded;
     },
-
-    decodeWithKms: function(token, callback)
-    {
-        try
-        {
-            if (!kmsJwt) {
-                kmsJwt = new KmsJwt({
-                    signingKey: process.env.SIGNING_KEY
-                });
-            }
-            kmsJwt.verify(token, function(err, decoded) {
-                if (err)
-                {
-                    console.error('KMS Verify Failed: '+err);
+    /**
+     * Attempts to decode token using kms.
+     * Callback called with decoded token.
+     * @param {*} token {string} token to decode
+     * @param {*} callback 
+     */
+    decodeWithKms: function(token, callback) {
+        try {
+            var kj = getKmsJwt();
+            kj.verify(token, (err, decoded) => {
+                if (err) {
+                    bbjwtLogger.debug('kms verify failed', { kmsError: err.toString() });
                     callback(err, null);
-                }
-                else
-                {
+                } else {
                     callback(null, decoded);
                 }
             });
+        } catch(err) {
+            bbjwtLogger.warn('error occurred while trying to decode with kms', { kmsError: err.toString() });
+            callback(err, null)
         }
-        catch(e)
-        {
-            callback(e, null)
-        }
-
+    },
+    /**
+     * Optionally sets a logger to better control communication.
+     * Must comply with winston logger api
+     * @param {*} lgr 
+     */
+    setLogger: function(lgr) {
+        bbjwtLogger = lgr;
     }
 };
-
-
-
-
